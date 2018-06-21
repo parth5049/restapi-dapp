@@ -72,6 +72,7 @@ exports.getEthBalanceOf = function(req, res){
 */
 
 exports.getJadeBalanceOf = function(req, res){
+	var web3 = new Web3(ethConfig.ethProvider);
 	if(web3.utils.isAddress(req.params.accountAddr)){
 		var sender = req.params.accountAddr;
 		var tokenInstance = new web3.eth.Contract(contractAbi, contractAddr);

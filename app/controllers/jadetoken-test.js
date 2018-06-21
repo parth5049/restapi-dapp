@@ -2,14 +2,14 @@
  * Module dependencies.
  */
 
-const ethConfig = require('../../config/eth/config-test');
-const jadetoken = require('../../config/eth/CryptoJadeTest.json');
+const ethConfigTest = require('../../config/eth/config-test');
+const jadetokentest = require('../../config/eth/CryptoJadeTest.json');
 var Web3 = require('web3');
 //const ethConfig = require('../../config/eth/config-dev');
-var web3 = new Web3(ethConfig.ethProvider);
+var web3 = new Web3(ethConfigTest.ethProvider);
  
-const contractAbi = jadetoken.abi;
-const contractAddr = ethConfig.tokenContractAddr;
+const contractAbiTest = jadetokentest.abi;
+const contractAddrTest = ethConfigTest.tokenContractAddr;
 
 /* 
 	Node Status and Connections
@@ -72,9 +72,18 @@ exports.getEthBalanceOf = function(req, res){
 */
 
 exports.getJadeBalanceOf = function(req, res){
+	//console.log("Provider: ");
+	var web3 = new Web3(ethConfigTest.ethProvider);
+	//console.log(web3.currentProvider);
 	if(web3.utils.isAddress(req.params.accountAddr)){
 		var sender = req.params.accountAddr;
-		var tokenInstance = new web3.eth.Contract(contractAbi, contractAddr);
+		//console.log("Contract ABI");
+		//console.log(contractAbi);
+		console.log("Contract Address");
+		console.log(contractAddrTest);
+		var tokenInstance = new web3.eth.Contract(contractAbiTest, contractAddrTest, {from: sender})
+		
+		console.log(tokenInstance);
 
 		tokenInstance.methods.balanceOf(sender).call({from: sender}).then(function(balance){
 			res.json({
