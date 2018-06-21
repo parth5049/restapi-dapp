@@ -83,7 +83,7 @@ exports.getJadeBalanceOf = function(req, res){
 		console.log(contractAddrTest);
 		var tokenInstance = new web3.eth.Contract(contractAbiTest, contractAddrTest, {from: sender})
 		
-		console.log(tokenInstance);
+		//console.log(tokenInstance);
 
 		tokenInstance.methods.balanceOf(sender).call({from: sender}).then(function(balance){
 			res.json({
