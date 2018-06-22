@@ -94,8 +94,11 @@ exports.getJadeBalanceOf = function(req, res){
 exports.sendTokens = function(req, res){
 	var web3 = new Web3(ethConfig.ethProvider);
 
+	var senderObj = web3.eth.accounts.privateKeyToAccount("0x"+req.body.senderPrivKey);
+	var sender = senderObj.address;
+
 	if(web3.utils.isAddress(req.body.sender)){
-		var sender = req.body.sender;
+		//var sender = req.body.sender;
     	var receiver = req.body.receiver;
 
 
