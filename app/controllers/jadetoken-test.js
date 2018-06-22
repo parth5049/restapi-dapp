@@ -98,3 +98,83 @@ exports.getJadeBalanceOf = function(req, res){
 		});
 	}
 }
+
+exports.sendTokens = function(req, res){
+	var web3 = new Web3(ethConfigTest.ethProvider);
+
+	if(web3.utils.isAddress(req.body.sender)){
+		var sender = req.body.sender;
+    	var receiver = req.body.receiver;
+
+
+		var tokenInstance = new web3.eth.Contract(contractAbiTest, contractAddrTest, {
+			from: sender
+		});
+
+		var txnNonce;
+		var txnObject;
+
+		web3.eth.getTransactionCount(sender)
+			.then(function(data){
+				txnNonce = data;
+				console.log(txnNonce);
+				txnObject = {
+					from : sender,
+					to : contractAddrTest,
+					value : "0x0",
+					gasPrice: web3.utils.toHex(web3.utils.toWei('20', 'Gwei')),
+					gas: web3.utils.toHex('250000'),
+					nonce: txnNonce,
+					data: tokenInstance.methods.transfer(receiver, web3.utils.toWei(req.body.amount, 'ether')).encodeABI()
+				};
+
+				console.log(txnObject);
+
+				//sendTransactionToEth(txnObject, req.body.prvkey);
+
+				var Tx = require('ethereumjs-tx');
+				var privateKey = new Buffer(req.body.senderPrivKey, 'hex');
+
+				var tx = new Tx(txnObject);
+				tx.sign(privateKey);
+
+				var serializedTx = tx.serialize();
+				console.log(serializedTx);
+
+				web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
+					.on('receipt', function(receipt){
+						console.log("Receipt Called");
+						res.json({
+							"data" : receipt
+						});
+					})
+					.on('error', function(err){
+						console.log("Error Called: "+ err);
+
+						var minedPending = "Be aware that it might still be mined";
+						var sourceErr = " " + err + " ";
+						if(sourceErr.indexOf(minedPending) !== -1)
+						{
+							res.json({
+							"status" : "pending",
+							"data" : err,
+							"errmsg" : "Your transaction is on the Blockchain. Depending on data traffic, it may take anywhere between 5-30 minutes to execute. Kindly check your wallet again in some time to be sure that the transaction was successfully executed."
+							});
+						}
+						else
+						{
+							res.json({
+								"status" : "error",
+								"data" : err,
+								"errmsg" : "There has been some error processing your transaction. Please try again later."
+							})
+						}
+					});
+			});
+
+	}else{
+		res.json({
+			"error" : "Incorrect Address/Account not found"
+		});
+	}
+};

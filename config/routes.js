@@ -22,12 +22,14 @@ module.exports = function(app, passport) {
   app.get('/test/createAccount',jadetokentest.createAccount);
   app.get('/test/getEthBalanceOf/:accountAddr',jadetokentest.getEthBalanceOf);
   app.get('/test/getJadeBalanceOf/:accountAddr',jadetokentest.getJadeBalanceOf);
+  app.post('/test/sendTokens',jadetokentest.sendTokens);
 
   // Live Routes
   app.get('/live/connect',jadetokenlive.connect);
   app.get('/live/createAccount',jadetokenlive.createAccount);
   app.get('/live/getEthBalanceOf/:accountAddr',jadetokenlive.getEthBalanceOf);
   app.get('/live/getJadeBalanceOf/:accountAddr',jadetokenlive.getJadeBalanceOf);
+  app.post('/live/sendTokens',jadetokenlive.sendTokens);
 
   
   
