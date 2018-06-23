@@ -19,6 +19,7 @@ const contractAddr = ethConfig.tokenContractAddr;
 exports.connect = function (req, res){
 	//console.log(web3);
 	res.json({
+		"status" : 200,
 		"provider" : web3.currentProvider,
 		"version" : web3.version,
 		"network" : web3.network
@@ -32,6 +33,7 @@ exports.createAccount = function(req, res){
 	var result = web3.eth.accounts.create();
 	console.log("Account Created");
 	res.json({
+		"status" : 200,
 		"data" : result
 	});
 };
@@ -54,6 +56,7 @@ exports.getEthBalanceOf = function(req, res){
 			//console.log(result);
 			balance = web3.utils.fromWei(result,"ether");
 			res.json({
+			"status" : 200,
       		"code" : "ETH",
 			"address" : req.params.accountAddr,
 			"balance" : balance
@@ -61,6 +64,7 @@ exports.getEthBalanceOf = function(req, res){
 		});
 	}else{
 		res.json({
+			"status" : 400,
 			"error" : "Incorrect Address/Account not found"
 		});
 	}
@@ -79,6 +83,7 @@ exports.getJadeBalanceOf = function(req, res){
 
 		tokenInstance.methods.balanceOf(sender).call({from: sender}).then(function(balance){
 			res.json({
+				"status" : 200,
 				"code" : "JADE",
 				"address" : sender,
 				"balance" : web3.utils.fromWei(balance,"ether")
@@ -86,11 +91,15 @@ exports.getJadeBalanceOf = function(req, res){
 		});
 	}else{
 		res.json({
+			"status" : 400,
 			"error" : "Incorrect Address/Account not found"
 		});
 	}
 };
 
+/*
+	This function sends Jade Tokens from sender to receiver
+*/
 exports.sendTokens = function(req, res){
 	var web3 = new Web3(ethConfig.ethProvider);
 
@@ -140,6 +149,7 @@ exports.sendTokens = function(req, res){
 					.on('receipt', function(receipt){
 						console.log("Receipt Called");
 						res.json({
+							"status" : 200,
 							"data" : receipt
 						});
 					})
@@ -151,7 +161,7 @@ exports.sendTokens = function(req, res){
 						if(sourceErr.indexOf(minedPending) !== -1)
 						{
 							res.json({
-							"status" : "pending",
+							"status" : 200,
 							"data" : err,
 							"errmsg" : "Your transaction is on the Blockchain. Depending on data traffic, it may take anywhere between 5-30 minutes to execute. Kindly check your wallet again in some time to be sure that the transaction was successfully executed."
 							});
@@ -159,7 +169,7 @@ exports.sendTokens = function(req, res){
 						else
 						{
 							res.json({
-								"status" : "error",
+								"status" : 400,
 								"data" : err,
 								"errmsg" : "There has been some error processing your transaction. Please try again later."
 							})
@@ -169,7 +179,44 @@ exports.sendTokens = function(req, res){
 
 	}else{
 		res.json({
+			"status" : 400,
 			"error" : "Incorrect Address/Account not found"
 		});
 	}
+};
+
+/*
+	This function gets all the transactions for a given address
+*/
+
+exports.getTransactions = function(req, res){
+
+	var fetch = require('node-fetch');
+	var apiEndpoint = "http://api.etherscan.io/api?module=account&action=tokentx&address="
+	+ req.params.accountAddr
+	+ "&page=1&offset=100&sort=desc&apikey="
+	+ process.env.API_KEY;
+	//console.log(apiEndpoint);
+	fetch(apiEndpoint, {
+		method: 'GET'
+	}).then(response => {
+		console.log("Response Received...");
+		response.json().then(function(data){
+			//console.log(data);
+			res.json({
+				status : 200,
+				address: req.params.accountAddr,
+				data: data
+			}); 
+		});
+		
+	}).catch(err => {
+		console.log("Error Received...")
+		console.log(err);
+		res.json({
+			status : 400,
+			error: err
+		});
+	});
+		
 };

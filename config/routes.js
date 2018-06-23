@@ -23,6 +23,7 @@ module.exports = function(app, passport) {
   app.get('/test/getEthBalanceOf/:accountAddr',jadetokentest.getEthBalanceOf);
   app.get('/test/getJadeBalanceOf/:accountAddr',jadetokentest.getJadeBalanceOf);
   app.post('/test/sendTokens',jadetokentest.sendTokens);
+  app.get('/test/getTransactions/:accountAddr',jadetokentest.getTransactions);
 
   // Live Routes
   app.get('/live/connect',jadetokenlive.connect);
