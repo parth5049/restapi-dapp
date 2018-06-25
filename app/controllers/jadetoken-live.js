@@ -103,6 +103,15 @@ exports.getJadeBalanceOf = function(req, res){
 exports.sendTokens = function(req, res){
 	var web3 = new Web3(ethConfig.ethProvider);
 
+	// Validations:
+	if(!req.body.senderPrivKey || !req.body.receiver || !req.body.amount){
+		res.json({
+			status: 400,
+			error: "Invalid Input"
+		});
+		return;
+	}
+
 	var senderObj = web3.eth.accounts.privateKeyToAccount("0x"+req.body.senderPrivKey);
 	var sender = senderObj.address;
 
@@ -190,33 +199,40 @@ exports.sendTokens = function(req, res){
 */
 
 exports.getTransactions = function(req, res){
+	var web3 = new Web3(ethConfig.ethProvider);
+	if(req.params.accountAddr || web3.utils.isAddress(req.params.accountAddr)){
 
-	var fetch = require('node-fetch');
-	var apiEndpoint = "http://api.etherscan.io/api?module=account&action=tokentx&address="
-	+ req.params.accountAddr
-	+ "&page=1&offset=100&sort=desc&apikey="
-	+ process.env.API_KEY;
-	//console.log(apiEndpoint);
-	fetch(apiEndpoint, {
-		method: 'GET'
-	}).then(response => {
-		console.log("Response Received...");
-		response.json().then(function(data){
-			//console.log(data);
+		var fetch = require('node-fetch');
+		var apiEndpoint = "http://api.etherscan.io/api?module=account&action=tokentx&address="
+		+ req.params.accountAddr
+		+ "&page=1&offset=100&sort=desc&apikey="
+		+ process.env.API_KEY;
+		//console.log(apiEndpoint);
+		fetch(apiEndpoint, {
+			method: 'GET'
+		}).then(response => {
+			console.log("Response Received...");
+			response.json().then(function(data){
+				//console.log(data);
+				res.json({
+					status : 200,
+					address: req.params.accountAddr,
+					data: data
+				}); 
+			});
+			
+		}).catch(err => {
+			console.log("Error Received...")
+			console.log(err);
 			res.json({
-				status : 200,
-				address: req.params.accountAddr,
-				data: data
-			}); 
+				status : 400,
+				error: err
+			});
 		});
-		
-	}).catch(err => {
-		console.log("Error Received...")
-		console.log(err);
+	}else{
 		res.json({
-			status : 400,
-			error: err
+			"status" : 400,
+			"error" : "Incorrect Address/Account not found"
 		});
-	});
-		
+	}
 };
