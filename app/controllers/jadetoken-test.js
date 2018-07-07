@@ -200,6 +200,108 @@ exports.sendTokens = function(req, res){
 	}
 };
 
+
+/*
+	This function sends Ethers from sender to receiver
+*/
+exports.sendEthers = function(req, res){
+	var web3 = new Web3(ethConfigTest.ethProvider);
+
+	// Validations:
+	if(!req.body.senderPrivKey || !req.body.receiver || !req.body.amount){
+		res.json({
+			status: 400,
+			error: "Invalid Input"
+		});
+		return;
+	}
+
+	var senderObj = web3.eth.accounts.privateKeyToAccount("0x"+req.body.senderPrivKey);
+	var sender = senderObj.address;
+	var receiver = req.body.receiver;
+	//console.log("Sender: "+sender);
+	//console.log("Receiver: "+receiver);
+	//console.log("Amount: "+req.body.amount);
+	
+	
+	//console.log(sender);
+
+	if(web3.utils.isAddress(sender) && web3.utils.isAddress(receiver)){
+		
+		/* var tokenInstance = new web3.eth.Contract(contractAbiTest, contractAddrTest, {
+			from: sender
+		}); */
+
+		var txnNonce;
+		var txnObject;
+		//console.log(web3.eth.currentProvider);
+
+		web3.eth.getTransactionCount(sender)
+			.then(function(data){
+				txnNonce = data;
+				console.log(txnNonce);
+				txnObject = {
+					from: sender,
+					to: receiver,
+					value : web3.utils.toHex(web3.utils.toWei(req.body.amount, 'ether')),
+					gasPrice: web3.utils.toHex(web3.utils.toWei('20', 'Gwei')),
+					gas: web3.utils.toHex('250000'),
+					nonce: txnNonce
+				};
+
+				console.log(txnObject);
+
+				//sendTransactionToEth(txnObject, req.body.prvkey);
+
+				var Tx = require('ethereumjs-tx');
+				var privateKey = new Buffer(req.body.senderPrivKey, 'hex');
+
+				var tx = new Tx(txnObject);
+				tx.sign(privateKey);
+
+				var serializedTx = tx.serialize();
+				console.log(serializedTx);
+
+				web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
+					.on('receipt', function(receipt){
+						console.log("Receipt Called");
+						res.json({
+							"status" : 200,
+							"data" : receipt
+						});
+					})
+					.on('error', function(err){
+						console.log("Error Called: "+ err);
+
+						var minedPending = "Be aware that it might still be mined";
+						var sourceErr = " " + err + " ";
+						if(sourceErr.indexOf(minedPending) !== -1)
+						{
+							res.json({
+							"status" : 200,
+							"data" : err,
+							"errmsg" : "Your transaction is on the Blockchain. Depending on data traffic, it may take anywhere between 5-30 minutes to execute. Kindly check your wallet again in some time to be sure that the transaction was successfully executed."
+							});
+						}
+						else
+						{
+							res.json({
+								"status" : 400,
+								"data" : err,
+								"errmsg" : "There has been some error processing your transaction. Please try again later."
+							})
+						}
+					});
+			});
+
+	}else{
+		res.json({
+			"status" : 400,
+			"error" : "Incorrect Address/Account not found"
+		});
+	}
+};
+
 /*
 	This function gets all the transactions for a given address
 */
