@@ -23,7 +23,8 @@ module.exports = function(app, passport) {
   app.get('/test/getEthBalanceOf/:accountAddr',jadetokentest.getEthBalanceOf);
   app.get('/test/getJadeBalanceOf/:accountAddr',jadetokentest.getJadeBalanceOf);
   app.post('/test/sendTokens',jadetokentest.sendTokens);
-  app.get('/test/getTransactions/:accountAddr',jadetokentest.getTransactions);
+  app.get('/test/getTransactionsJade/:accountAddr',jadetokentest.getTransactions);
+  app.get('/test/getTransactionsEth/:accountAddr',jadetokentest.getTransactionsEth);
   app.post('/test/sendEthers',jadetokentest.sendEthers);
 
   // Live Routes
@@ -32,7 +33,8 @@ module.exports = function(app, passport) {
   app.get('/live/getEthBalanceOf/:accountAddr',jadetokenlive.getEthBalanceOf);
   app.get('/live/getJadeBalanceOf/:accountAddr',jadetokenlive.getJadeBalanceOf);
   app.post('/live/sendTokens',jadetokenlive.sendTokens);
-  app.get('/live/getTransactions/:accountAddr',jadetokenlive.getTransactions);
+  app.get('/live/getTransactionsJade/:accountAddr',jadetokenlive.getTransactions);
+  app.get('/live/getTransactionsEth/:accountAddr',jadetokenlive.getTransactionsEth);
   app.post('/live/sendEthers',jadetokenlive.sendEthers);
 
   
