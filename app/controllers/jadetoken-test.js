@@ -311,7 +311,7 @@ exports.getTransactions = function(req, res){
 	if(req.params.accountAddr || web3.utils.isAddress(req.params.accountAddr)){
 
 		var fetch = require('node-fetch');
-		var apiEndpoint = "http://api-rinkeby.etherscan.io/api?module=account&action=tokentx&address="
+		var apiEndpoint = "http://api-rinkeby.etherscan.io/api?module=account&action=txlist&address="
 		+ req.params.accountAddr
 		+ "&page=1&offset=100&sort=desc&apikey="
 		+ process.env.API_KEY;
