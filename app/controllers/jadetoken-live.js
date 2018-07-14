@@ -343,7 +343,7 @@ exports.getTransactions = function(req, res){
 */
 
 exports.getTransactionsEth = function(req, res){
-	var web3 = new Web3(ethConfigTest.ethProvider);
+	var web3 = new Web3(ethConfig.ethProvider);
 	if(req.params.accountAddr || web3.utils.isAddress(req.params.accountAddr)){
 
 		var fetch = require('node-fetch');
