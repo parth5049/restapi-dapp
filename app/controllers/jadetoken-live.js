@@ -114,12 +114,11 @@ exports.sendTokens = function(req, res){
 
 	var senderObj = web3.eth.accounts.privateKeyToAccount("0x"+req.body.senderPrivKey);
 	var sender = senderObj.address;
+	var receiver = req.body.receiver;
+	//console.log(sender);
 
-	if(web3.utils.isAddress(req.body.sender)){
-		//var sender = req.body.sender;
-    	var receiver = req.body.receiver;
-
-
+	if(web3.utils.isAddress(sender) && web3.utils.isAddress(receiver)){
+		
 		var tokenInstance = new web3.eth.Contract(contractAbi, contractAddr, {
 			from: sender
 		});
@@ -212,9 +211,9 @@ exports.sendEthers = function(req, res){
 	var senderObj = web3.eth.accounts.privateKeyToAccount("0x"+req.body.senderPrivKey);
 	var sender = senderObj.address;
 	var receiver = req.body.receiver;
-	//console.log("Sender: "+sender);
-	//console.log("Receiver: "+receiver);
-	//console.log("Amount: "+req.body.amount);
+	console.log("Sender: "+sender);
+	console.log("Receiver: "+receiver);
+	console.log("Amount: "+req.body.amount);
 	
 	
 	//console.log(sender);
