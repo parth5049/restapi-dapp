@@ -237,7 +237,7 @@ exports.sendEthers = function(req, res){
 					to: receiver,
 					value : web3.utils.toHex(web3.utils.toWei(req.body.amount, 'ether')),
 					gasPrice: web3.utils.toHex(web3.utils.toWei('20', 'Gwei')),
-					gas: web3.utils.toHex('250000'),
+					gas: web3.utils.toHex('100000'),
 					nonce: txnNonce
 				};
 
